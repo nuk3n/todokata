@@ -12,9 +12,61 @@ export default class App extends React.Component {
     filter: 'all',
   };
 
-  addItem = (label) => {
+  componentDidMount() {
+    this.interval = setInterval(() => {
+      this.setState(({ todoData }) => {
+        const newArr = todoData.map((item) => {
+          if (item.timerTime === 0) {
+            return item;
+          }
+          if (!item.pause) {
+            // eslint-disable-next-line no-param-reassign
+            item.timerTime--;
+          }
+          return item;
+        });
+        return {
+          todoData: newArr,
+        };
+      });
+    }, 1000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
+  startTimer = (id) => {
     this.setState(({ todoData }) => {
-      const newData = [...todoData, this.createItem(label)];
+      const newData = [...todoData].map((item) => {
+        if (item.id === id) {
+          return { ...item, pause: false };
+        }
+        return { ...item };
+      });
+      return {
+        todoData: newData,
+      };
+    });
+  };
+
+  stopTimer = (id) => {
+    this.setState(({ todoData }) => {
+      const newData = [...todoData].map((item) => {
+        if (item.id === id) {
+          return { ...item, pause: true };
+        }
+        return { ...item };
+      });
+      return {
+        todoData: newData,
+      };
+    });
+  };
+
+  addItem = (label, time) => {
+    this.setState(({ todoData }) => {
+      const newData = [...todoData, this.createItem(label, time)];
       return {
         todoData: newData,
       };
@@ -34,7 +86,7 @@ export default class App extends React.Component {
   onToggleCompleted = (id) => {
     this.setState(({ todoData }) => {
       const newData = [...todoData].map((item) =>
-        item.id === id ? { ...item, completed: !item.completed } : { ...item }
+        item.id === id ? { ...item, completed: !item.completed, pause: true } : { ...item }
       );
       return {
         todoData: newData,
@@ -83,12 +135,14 @@ export default class App extends React.Component {
     });
   };
 
-  createItem(label) {
+  createItem(label, time) {
     return {
       label,
       completed: false,
       id: this.nextID++,
       date: new Date(),
+      timerTime: time,
+      pause: true,
     };
   }
 
@@ -101,6 +155,8 @@ export default class App extends React.Component {
         <AppInputForm onAdded={this.addItem} />
         <AppMain
           todoItems={this.stateFilter()}
+          startTimer={this.startTimer}
+          stopTimer={this.stopTimer}
           onCompleted={this.onToggleCompleted}
           onDelete={this.deleteItem}
           activeTaskCount={activeTaskCount}

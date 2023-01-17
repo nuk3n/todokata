@@ -3,32 +3,67 @@ import './app-input-form.css';
 
 export default class AppInputForm extends React.Component {
   state = {
-    inputValue: '',
+    taskValue: '',
+    minValue: '',
+    secValue: '',
   };
 
   onSubmit = (e) => {
     e.preventDefault();
-    this.props.onAdded(this.state.inputValue);
+    const timeInSec = Number(this.state.minValue * 60) + Number(this.state.secValue);
+    this.props.onAdded(this.state.taskValue, timeInSec);
     this.setState({
-      inputValue: '',
+      taskValue: '',
+      minValue: '',
+      secValue: '',
     });
   };
 
-  onChange = (e) => {
+  onChangeTask = (e) => {
     this.setState({
-      inputValue: e.target.value,
+      taskValue: e.target.value,
+    });
+  };
+
+  onChangeMin = (e) => {
+    this.setState({
+      minValue: e.target.value,
+    });
+  };
+
+  onChangeSec = (e) => {
+    this.setState({
+      secValue: e.target.value,
     });
   };
 
   render() {
     return (
-      <form onSubmit={this.onSubmit}>
+      <form className="new-todo-form" onSubmit={this.onSubmit}>
         <input
           className="new-todo"
-          placeholder="What needs to be done?"
-          value={this.state.inputValue}
-          onChange={this.onChange}
+          placeholder="Task"
+          value={this.state.taskValue}
+          onChange={this.onChangeTask}
+          required
         />
+        <input
+          className="new-todo-form__timer"
+          placeholder="Min"
+          type="number"
+          max="60"
+          value={this.state.minValue}
+          onChange={this.onChangeMin}
+        />
+        <input
+          className="new-todo-form__timer"
+          placeholder="Sec"
+          type="number"
+          max="60"
+          value={this.state.secValue}
+          onChange={this.onChangeSec}
+        />
+        <button type="submit" />
       </form>
     );
   }

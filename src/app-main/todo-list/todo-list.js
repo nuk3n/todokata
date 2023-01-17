@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import './todo-list.css';
 
 function TodoList(props) {
-  const { todos, onDelete, onCompleted } = props;
+  const { todos, onDelete, onCompleted, startTimer, stopTimer } = props;
 
   return (
     <ul className="todo-list">
@@ -14,6 +14,8 @@ function TodoList(props) {
           {...item}
           onCompleted={() => onCompleted(item.id)}
           onDelete={() => onDelete(item.id)}
+          startTimer={() => startTimer(item.id)}
+          stopTimer={() => stopTimer(item.id)}
         />
       ))}
     </ul>

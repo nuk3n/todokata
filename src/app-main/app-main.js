@@ -14,11 +14,19 @@ function AppMain(props) {
     completedFilter,
     allFilter,
     deleteCompleted,
+    startTimer,
+    stopTimer,
   } = props;
 
   return (
     <section className="main">
-      <TodoList todos={todoItems} onCompleted={onCompleted} onDelete={onDelete} />
+      <TodoList
+        todos={todoItems}
+        onCompleted={onCompleted}
+        onDelete={onDelete}
+        startTimer={startTimer}
+        stopTimer={stopTimer}
+      />
       <TodoFooter
         activeTaskCount={activeTaskCount}
         activeFilter={activeFilter}
