@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import './todo-list.css';
 
 function TodoList(props) {
-  const { todos, onDelete, onCompleted, startTimer, stopTimer } = props;
+  const { todos } = props;
 
   return (
     <ul className="todo-list">
@@ -12,10 +12,6 @@ function TodoList(props) {
           key={item.id}
           /* eslint-disable-next-line react/jsx-props-no-spreading */
           {...item}
-          onCompleted={() => onCompleted(item.id)}
-          onDelete={() => onDelete(item.id)}
-          startTimer={() => startTimer(item.id)}
-          stopTimer={() => stopTimer(item.id)}
         />
       ))}
     </ul>
@@ -30,8 +26,6 @@ TodoList.propTypes = {
       id: PropTypes.number,
     })
   ),
-  onDelete: PropTypes.func,
-  onCompleted: PropTypes.func,
 };
 
 export default TodoList;

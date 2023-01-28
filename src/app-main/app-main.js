@@ -4,44 +4,18 @@ import PropTypes from 'prop-types';
 import './app-main.css';
 
 function AppMain(props) {
-  const {
-    todoItems,
-    onDelete,
-    onCompleted,
-    activeTaskCount,
-    filter,
-    activeFilter,
-    completedFilter,
-    allFilter,
-    deleteCompleted,
-    startTimer,
-    stopTimer,
-  } = props;
+  const { todoItems, activeTaskCount, deleteCompleted } = props;
 
   return (
     <section className="main">
-      <TodoList
-        todos={todoItems}
-        onCompleted={onCompleted}
-        onDelete={onDelete}
-        startTimer={startTimer}
-        stopTimer={stopTimer}
-      />
-      <TodoFooter
-        activeTaskCount={activeTaskCount}
-        activeFilter={activeFilter}
-        filter={filter}
-        completedFilter={completedFilter}
-        allFilter={allFilter}
-        deleteCompleted={deleteCompleted}
-      />
+      <TodoList todos={todoItems} />
+      <TodoFooter activeTaskCount={activeTaskCount} deleteCompleted={deleteCompleted} />
     </section>
   );
 }
 
 AppMain.defaultProps = {
   activeTaskCount: 0,
-  filter: 'all',
 };
 
 AppMain.propTypes = {
@@ -53,7 +27,6 @@ AppMain.propTypes = {
     })
   ),
   activeTaskCount: PropTypes.number,
-  filter: PropTypes.string,
 };
 
 export default AppMain;

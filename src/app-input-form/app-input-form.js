@@ -1,70 +1,50 @@
-import React from 'react';
+import { useState } from 'react';
 import './app-input-form.css';
 
-export default class AppInputForm extends React.Component {
-  state = {
-    taskValue: '',
-    minValue: '',
-    secValue: '',
-  };
+function AppInputForm(props) {
+  const [taskValue, setTaskValue] = useState('');
+  const [minValue, setMinValue] = useState('');
+  const [secValue, setSecValue] = useState('');
 
-  onSubmit = (e) => {
+  const onSubmit = (e) => {
     e.preventDefault();
-    const timeInSec = Number(this.state.minValue * 60) + Number(this.state.secValue);
-    this.props.onAdded(this.state.taskValue, timeInSec);
-    this.setState({
-      taskValue: '',
-      minValue: '',
-      secValue: '',
-    });
+    const time = Number(minValue * 60) + Number(secValue);
+    props.onAdded(taskValue, time);
+    setTaskValue('');
+    setMinValue('');
+    setSecValue('');
   };
 
-  onChangeTask = (e) => {
-    this.setState({
-      taskValue: e.target.value,
-    });
-  };
-
-  onChangeMin = (e) => {
-    this.setState({
-      minValue: e.target.value,
-    });
-  };
-
-  onChangeSec = (e) => {
-    this.setState({
-      secValue: e.target.value,
-    });
-  };
-
-  render() {
-    return (
-      <form className="new-todo-form" onSubmit={this.onSubmit}>
-        <input
-          className="new-todo"
-          placeholder="Task"
-          value={this.state.taskValue}
-          onChange={this.onChangeTask}
-          required
-        />
-        <input
-          className="new-todo-form__timer"
-          placeholder="Min"
-          type="number"
-          max="60"
-          value={this.state.minValue}
-          onChange={this.onChangeMin}
-        />
-        <input
-          className="new-todo-form__timer"
-          placeholder="Sec"
-          type="number"
-          max="60"
-          value={this.state.secValue}
-          onChange={this.onChangeSec}
-        />
-        <button type="submit" />
-      </form>
-    );
+  function handleChange(e) {
+    if (e.target.name === 'task') setTaskValue(e.target.value);
+    if (e.target.name === 'min') setMinValue(e.target.value);
+    if (e.target.name === 'sec') setSecValue(e.target.value);
   }
+
+  return (
+    <form className="new-todo-form" onSubmit={onSubmit}>
+      <input className="new-todo" name="task" placeholder="Task" value={taskValue} onChange={handleChange} required />
+      <input
+        className="new-todo-form__timer"
+        name="min"
+        placeholder="Min"
+        type="number"
+        max="60"
+        value={minValue}
+        onChange={handleChange}
+      />
+      <input
+        className="new-todo-form__timer"
+        name="sec"
+        placeholder="Sec"
+        type="number"
+        max="60"
+        value={secValue}
+        onChange={handleChange}
+      />
+      <button type="submit" />
+    </form>
+  );
 }
+
+export default AppInputForm;

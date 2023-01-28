@@ -2,171 +2,131 @@ import AppHeader from '../app-header';
 import AppMain from '../app-main';
 import './app.css';
 import AppInputForm from '../app-input-form';
-import React from 'react';
+import { Context } from '../context';
+import { useState, useMemo } from 'react';
 
-export default class App extends React.Component {
-  nextID = 1;
+function App() {
+  const [todoData, setTodoData] = useState([]);
+  const [filter, setFilter] = useState('all');
+  const [nextId, setNextId] = useState(0);
 
-  state = {
-    todoData: [],
-    filter: 'all',
-  };
-
-  componentDidMount() {
-    this.interval = setInterval(() => {
-      this.setState(({ todoData }) => {
-        const newArr = todoData.map((item) => {
-          if (item.timerTime === 0) {
-            return item;
-          }
-          if (!item.pause) {
-            // eslint-disable-next-line no-param-reassign
-            item.timerTime--;
-          }
-          return item;
-        });
-        return {
-          todoData: newArr,
-        };
-      });
-    }, 1000);
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.interval);
-  }
-
-  startTimer = (id) => {
-    this.setState(({ todoData }) => {
-      const newData = [...todoData].map((item) => {
+  const startTimer = (id) => {
+    setTodoData((data) =>
+      data.map((item) => {
         if (item.id === id) {
           return { ...item, pause: false };
         }
         return { ...item };
-      });
-      return {
-        todoData: newData,
-      };
-    });
+      })
+    );
   };
 
-  stopTimer = (id) => {
-    this.setState(({ todoData }) => {
-      const newData = [...todoData].map((item) => {
+  const stopTimer = (id) => {
+    setTodoData((data) =>
+      data.map((item) => {
         if (item.id === id) {
           return { ...item, pause: true };
         }
-        return { ...item };
-      });
-      return {
-        todoData: newData,
-      };
-    });
+        return item;
+      })
+    );
   };
 
-  addItem = (label, time) => {
-    this.setState(({ todoData }) => {
-      const newData = [...todoData, this.createItem(label, time)];
-      return {
-        todoData: newData,
-      };
-    });
-  };
-
-  deleteItem = (id) => {
-    this.setState(({ todoData }) => {
-      const idx = todoData.findIndex((el) => el.id === id);
-      const newData = [...todoData].filter((item, i) => i !== idx);
-      return {
-        todoData: newData,
-      };
-    });
-  };
-
-  onToggleCompleted = (id) => {
-    this.setState(({ todoData }) => {
-      const newData = [...todoData].map((item) =>
-        item.id === id ? { ...item, completed: !item.completed, pause: true } : { ...item }
-      );
-      return {
-        todoData: newData,
-      };
-    });
-  };
-
-  deleteCompleted = () => {
-    this.setState(({ todoData }) => {
-      const newData = [...todoData].filter((item) => !item.completed);
-      return {
-        todoData: newData,
-      };
-    });
-  };
-
-  stateFilter = () => {
-    if (this.state.filter === 'all') {
-      return this.state.todoData;
-    }
-
-    if (this.state.filter === 'active') {
-      return [...this.state.todoData.filter((item) => !item.completed)];
-    }
-
-    if (this.state.filter === 'completed') {
-      return [...this.state.todoData.filter((item) => item.completed)];
-    }
-  };
-
-  allFilter = () => {
-    this.setState({
-      filter: 'all',
-    });
-  };
-
-  activeFilter = () => {
-    this.setState({
-      filter: 'active',
-    });
-  };
-
-  completedFilter = () => {
-    this.setState({
-      filter: 'completed',
-    });
-  };
-
-  createItem(label, time) {
+  function createItem(label, time) {
+    setNextId(nextId + 1);
     return {
       label,
       completed: false,
-      id: this.nextID++,
+      id: nextId,
       date: new Date(),
-      timerTime: time,
+      time,
       pause: true,
     };
   }
 
-  render() {
-    const activeTaskCount = this.state.todoData.filter((item) => !item.completed).length;
+  const addItem = (label, time) => {
+    setTodoData((data) => [...data, createItem(label, time)]);
+  };
 
-    return (
-      <section className="todoapp">
-        <AppHeader />
-        <AppInputForm onAdded={this.addItem} />
-        <AppMain
-          todoItems={this.stateFilter()}
-          startTimer={this.startTimer}
-          stopTimer={this.stopTimer}
-          onCompleted={this.onToggleCompleted}
-          onDelete={this.deleteItem}
-          activeTaskCount={activeTaskCount}
-          deleteCompleted={this.deleteCompleted}
-          activeFilter={this.activeFilter}
-          completedFilter={this.completedFilter}
-          allFilter={this.allFilter}
-          filter={this.state.filter}
-        />
-      </section>
+  const deleteItem = (id) => {
+    setTodoData((data) => {
+      const idx = data.findIndex((el) => el.id === id);
+      return [...data].filter((item, i) => i !== idx);
+    });
+  };
+
+  const onToggleCompleted = (id) => {
+    setTodoData((data) =>
+      data.map((item) => (item.id === id ? { ...item, completed: !item.completed, pause: true } : { ...item }))
     );
-  }
+  };
+
+  const deleteCompleted = () => {
+    setTodoData((data) => data.filter((item) => !item.completed));
+  };
+
+  const stateFilter = () => {
+    if (filter === 'all') {
+      return todoData;
+    }
+
+    if (filter === 'active') {
+      return [...todoData.filter((item) => !item.completed)];
+    }
+
+    if (filter === 'completed') {
+      return [...todoData.filter((item) => item.completed)];
+    }
+  };
+
+  const allFilter = () => {
+    setFilter('all');
+  };
+
+  const activeFilter = () => {
+    setFilter('active');
+  };
+
+  const completedFilter = () => {
+    setFilter('completed');
+  };
+
+  const activeTaskCount = todoData.filter((item) => !item.completed).length;
+  const taskFunctions = useMemo(
+    () => ({
+      startTimer,
+      stopTimer,
+      onToggleCompleted,
+      deleteItem,
+    }),
+    []
+  );
+  const footerFilters = useMemo(
+    () => ({
+      filter,
+      allFilter,
+      completedFilter,
+      activeFilter,
+    }),
+    [filter]
+  );
+  const contextItems = useMemo(
+    () => ({
+      taskFunctions,
+      footerFilters,
+    }),
+    [taskFunctions, footerFilters]
+  );
+  return (
+    <section className="todoapp">
+      <Context.Provider value={contextItems}>
+        <AppHeader />
+        <AppInputForm onAdded={addItem} />
+        <AppMain todoItems={stateFilter()} activeTaskCount={activeTaskCount} deleteCompleted={deleteCompleted} />
+      </Context.Provider>
+    </section>
+  );
+  // }
 }
+
+export default App;

@@ -1,8 +1,13 @@
+import { Context } from '../../context';
 import PropTypes from 'prop-types';
 import './todo-footer.css';
+import { useContext } from 'react';
 
 function TodoFooter(props) {
-  const { activeTaskCount, filter, activeFilter, completedFilter, allFilter, deleteCompleted } = props;
+  const { activeTaskCount, deleteCompleted } = props;
+  const {
+    footerFilters: { filter, allFilter, completedFilter, activeFilter },
+  } = useContext(Context);
 
   return (
     <footer className="footer">
@@ -32,12 +37,8 @@ function TodoFooter(props) {
 }
 
 TodoFooter.propTypes = {
-  activeFilter: PropTypes.func,
-  completedFilter: PropTypes.func,
-  allFilter: PropTypes.func,
   deleteCompleted: PropTypes.func,
   activeTaskCount: PropTypes.number,
-  filter: PropTypes.string,
 };
 
 export default TodoFooter;

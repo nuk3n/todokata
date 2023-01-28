@@ -1,35 +1,54 @@
+import { Context } from '../../context';
 import PropTypes from 'prop-types';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import './todo-list-item.css';
 import '../todo-list/todo-list.css';
+import { useState, useEffect, useContext } from 'react';
 
 function TodoListItem(props) {
-  const { label, id, completed, onDelete, onCompleted, date, timerTime, startTimer, stopTimer } = props;
+  const { label, id, completed, date, time, pause } = props;
+  const [timeInSeconds, setTimeInSeconds] = useState(time);
+  const {
+    taskFunctions: { startTimer, stopTimer, onToggleCompleted, deleteItem },
+  } = useContext(Context);
+
+  const minutes = Math.floor(timeInSeconds / 60);
+  const seconds = timeInSeconds % 60;
+
   let status = '';
   if (completed) {
     status += 'completed';
   }
 
-  const timerMinutes = Math.floor(timerTime / 60);
-  const timerSeconds = timerTime % 60 < 10 ? `0${timerTime % 60}` : timerTime % 60;
+  useEffect(() => {
+    if (pause || timeInSeconds === 0) {
+      return;
+    }
+    const interval = setInterval(() => {
+      if (timeInSeconds > 0) setTimeInSeconds(timeInSeconds - 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [pause, timeInSeconds]);
+
+  const formatedSeconds = seconds < 10 ? `0${seconds % 60}` : seconds;
 
   return (
     <li className={status}>
       <div className="view">
-        <input id={id} className="toggle" type="checkbox" checked={completed} onChange={onCompleted} />
+        <input id={id} className="toggle" type="checkbox" checked={completed} onChange={() => onToggleCompleted(id)} />
         <label htmlFor={id}>
           <span className="title">{label}</span>
           <span className="description">
-            <button className="icon icon-play" onClick={startTimer} type="button" />
-            <button className="icon icon-pause" onClick={stopTimer} type="button" />
+            <button className="icon icon-play" onClick={() => startTimer(id)} type="button" />
+            <button className="icon icon-pause" onClick={() => stopTimer(id)} type="button" />
             <span className="timer">
-              {timerMinutes}:{timerSeconds}
+              {minutes}:{formatedSeconds}
             </span>
           </span>
           <span className="description">created {formatDistanceToNow(date, { includeSeconds: true })}</span>
         </label>
         <button className="icon icon-edit" type="button" />
-        <button className="icon icon-destroy" onClick={onDelete} type="button" />
+        <button className="icon icon-destroy" onClick={() => deleteItem(id)} type="button" />
       </div>
       <input type="text" className="edit" defaultValue="Editing task" />
     </li>
@@ -38,8 +57,6 @@ function TodoListItem(props) {
 
 TodoListItem.propTypes = {
   label: PropTypes.string,
-  onCompleted: PropTypes.func,
-  onDelete: PropTypes.func,
   completed: PropTypes.bool,
 };
 
