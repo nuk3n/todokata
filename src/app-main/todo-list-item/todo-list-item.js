@@ -5,6 +5,8 @@ import './todo-list-item.css';
 import '../todo-list/todo-list.css';
 import { useState, useEffect, useContext } from 'react';
 
+const classNames = require('classnames');
+
 function TodoListItem(props) {
   const { label, id, completed, date, time, pause } = props;
   const [timeInSeconds, setTimeInSeconds] = useState(time);
@@ -15,10 +17,7 @@ function TodoListItem(props) {
   const minutes = Math.floor(timeInSeconds / 60);
   const seconds = timeInSeconds % 60;
 
-  let status = '';
-  if (completed) {
-    status += 'completed';
-  }
+  const taskClassNames = classNames({ completed });
 
   useEffect(() => {
     if (pause || timeInSeconds === 0) {
@@ -33,7 +32,7 @@ function TodoListItem(props) {
   const formatedSeconds = seconds < 10 ? `0${seconds % 60}` : seconds;
 
   return (
-    <li className={status}>
+    <li className={taskClassNames}>
       <div className="view">
         <input id={id} className="toggle" type="checkbox" checked={completed} onChange={() => onToggleCompleted(id)} />
         <label htmlFor={id}>
