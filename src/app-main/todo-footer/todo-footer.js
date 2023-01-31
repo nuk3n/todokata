@@ -8,23 +8,26 @@ function TodoFooter(props) {
   const {
     footerFilters: { filter, allFilter, completedFilter, activeFilter },
   } = useContext(Context);
+  const allClass = filter === 'all' ? 'selected' : null;
+  const activeClass = filter === 'active' ? 'selected' : null;
+  const completedClass = filter === 'completed' ? 'selected' : null;
 
   return (
     <footer className="footer">
       <span className="todo-count">{activeTaskCount} items left</span>
       <ul className="filters">
         <li>
-          <button className={filter === 'all' ? 'selected' : null} onClick={allFilter} type="button">
+          <button className={allClass} onClick={allFilter} type="button">
             All
           </button>
         </li>
         <li>
-          <button className={filter === 'active' ? 'selected' : null} onClick={activeFilter} type="button">
+          <button className={activeClass} onClick={activeFilter} type="button">
             Active
           </button>
         </li>
         <li>
-          <button className={filter === 'completed' ? 'selected' : null} onClick={completedFilter} type="button">
+          <button className={completedClass} onClick={completedFilter} type="button">
             Completed
           </button>
         </li>
